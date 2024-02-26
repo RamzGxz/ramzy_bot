@@ -68,9 +68,9 @@ bot.on('new_chat_members', (resp) => {
 
   newMembers.forEach((member) => {
     const msgSend = `
-  Hello ${member.first_name} ${member.last_name} Welcome to
-  UISTELLAR COMMUNITY!💫
-  We hope your enjoy to this conversations! 🤓
+Hello ${member.first_name} ${member.last_name} Welcome to
+UISTELLAR COMMUNITY!💫
+We hope your enjoy to this conversations! 🤓
   `
     bot.sendMessage(process.env.CHAT_ID, msgSend)
   })
@@ -172,6 +172,26 @@ What name of images do you want to see?
 ` 
   if(isGroupChat) {
     bot.sendMessage(process.env.CHAT_ID, question)
+    bot.once('message', async (responseMsg)=>{
+      bot.sendMessage(process.env.CHAT_ID, 'OK, your image will be visible as soon as possible. please wait!')
+      const text = responseMsg.text
+      try {
+        const result = await imageScraper(text);
+      
+        for (const item of result) {
+          await bot.sendPhoto(process.env.CHAT_ID, item.url, {
+            caption: item.title
+          })
+        }
+      
+        // Setelah semua foto dikirim, kirim pesan lain
+        await bot.sendMessage(process.env.CHAT_ID, 'That\'s all, if you want more please retype /getimages')
+      } catch (error) {
+        console.error('Error:', error)
+      }
+      
+    })
+    
   } else {
     bot.sendMessage(resp.from.id, question)
     bot.once('message', async (responseMsg)=>{
