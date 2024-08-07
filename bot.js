@@ -6,23 +6,23 @@ import { } from 'dotenv'
 
 // const token = '7368378129:AAFyFLKlwNf4O_ffXdQ5dFmzTBGqwQdnnTs';
 const token = process.env.TELEGRAM_BOT_TOKEN || '7368378129:AAFyFLKlwNf4O_ffXdQ5dFmzTBGqwQdnnTs';
-const bot = new TelegramBot(token);
+const bot = new TelegramBot(token, { polling: true });
 
 // Membuat aplikasi express
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-// const URL = process.env.URL || 'https://bot-wellcome..vercel.app';
+const URL = process.env.URL || 'https://pavo-bot.vercel.app';
 
 
-// bot.setWebHook(`${URL}/bot${token}`)
-//     .then(() => {
-//         console.log(`Webhook set to ${URL}/bot${token}`);
-//     })
-//     .catch((error) => {
-//         console.error('Error setting webhook:', error);
-//     });
+bot.setWebHook(`${URL}/bot${token}`)
+    .then(() => {
+        console.log(`Webhook set to ${URL}/bot${token}`);
+    })
+    .catch((error) => {
+        console.error('Error setting webhook:', error);
+    });
 
 // Webhook endpoint
 // app.post(`/bot${token}`, (req, res) => {
@@ -39,12 +39,12 @@ app.use(express.urlencoded({ extended: true }))
 // });
 
 app.post('/webhook', (req, res) => {
-    try {
-        bot.processUpdate(req.body)
-        res.sendStatus(200)
-    } catch (error) {
-        res.status(500).send(error)
-    }
+  try {
+    bot.processUpdate(req.body)
+    res.sendStatus(200)
+  } catch (error) {
+    res.status(500).send(error)
+  }
 })
 
 
@@ -131,8 +131,8 @@ bot.onText(/\/trade/, (msg) => {
           ]
         }
       }
-      
-      bot.sendMessage(id, )
+
+      bot.sendMessage(id,)
 
     } else {
       bot.sendMessage(msg.chat.id, 'youre choose sell')
