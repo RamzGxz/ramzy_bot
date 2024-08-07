@@ -25,18 +25,18 @@ app.use(express.urlencoded({ extended: true }))
 //     });
 
 // Webhook endpoint
-app.post(`/bot${token}`, (req, res) => {
-    console.log('Received webhook');
-    console.log(req.body);
-    bot.processUpdate(req.body)
-        .then(() => {
-            res.sendStatus(200);
-        })
-        .catch((error) => {
-            console.error('Error processing update:', error);
-            res.sendStatus(500);
-        });
-});
+// app.post(`/bot${token}`, (req, res) => {
+//     console.log('Received webhook');
+//     console.log(req.body);
+//     bot.processUpdate(req.body)
+//         .then(() => {
+//             res.sendStatus(200);
+//         })
+//         .catch((error) => {
+//             console.error('Error processing update:', error);
+//             res.sendStatus(500);
+//         });
+// });
 
 app.post('/webhook', (req, res) => {
     try {
