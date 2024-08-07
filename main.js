@@ -1,11 +1,11 @@
-require('dotenv').config()
-const telebot = require('node-telegram-bot-api')
-const express = require('express')
-const cors = require('cors')
+import telebot from 'node-telegram-bot-api'
+import express, { urlencoded, json } from 'express'
+import { getAccInfo } from './api/solana.js'
+import { } from 'dotenv/config.js'
 const app = express()
 const port = 3000
 // const scrape = require('./scrape')
-const imageScraper = require('./scrape')
+import imageScraper from './scrape.js'
 
 // use this to development
 const options = {
@@ -17,8 +17,8 @@ const bot = new telebot(process.env.API_TOKEN, options)
 // const bot = new telebot(process.env.API_TOKEN)
 
 
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+app.use(urlencoded({ extended: true }))
+app.use(json())
 
 // webHook telebots
 
@@ -78,7 +78,7 @@ We hope your enjoy to this conversations! 🤓
 
 bot.onText(new RegExp('^/start$'), (resp) => {
   const isGroupChat = resp.chat.type === 'group' || resp.chat.type === 'supergroup'
-  
+
   if (isGroupChat) {
     // Percakapan grup
     const msg = `
@@ -121,8 +121,8 @@ bot.onText(new RegExp('^/earthquake$'), async (resp) => {
   const respData = await data.json()
   const info = respData.Infogempa.gempa
   const isGroupChat = resp.chat.type === 'group' || resp.chat.type === 'supergroup'
-  
-    const dataMsg = `
+
+  const dataMsg = `
 Date : ${info.Tanggal}
 Time (Indonesian) : ${info.Jam}
 Coordinates : ${info.Coordinates}
@@ -131,7 +131,7 @@ location : ${info.Wilayah}
 Potency : ${info.Potensi}
 `
 
-  if(isGroupChat) {
+  if (isGroupChat) {
     bot.sendPhoto(process.env.CHAT_ID, `https://data.bmkg.go.id/DataMKG/TEWS/${info.Shakemap}`, {
       caption: dataMsg
     })
@@ -140,11 +140,11 @@ Potency : ${info.Potensi}
       caption: dataMsg
     })
   }
-  
+
 })
 
 
-bot.onText(new RegExp('^/userinfo$'), (resp)=>{
+bot.onText(new RegExp('^/userinfo$'), (resp) => {
   const isGroupChat = resp.chat.type === 'group' || resp.chat.type === 'supergroup'
 
   const msg = `
@@ -155,66 +155,101 @@ Laguage : ${resp.from.language_code}
 Bot : ${resp.from.is_bot}
 `
 
-  if(isGroupChat){
+  if (isGroupChat) {
     bot.sendMessage(process.env.CHAT_ID, msg)
-  } else{
+  } else {
     bot.sendMessage(resp.from.id, msg)
   }
 
 })
 
-bot.onText(new RegExp('^/getimages$'), (resp)=>{
+bot.onText(new RegExp('^/getimages$'), (resp) => {
   const isGroupChat = resp.chat.type === 'group' || resp.chat.type === 'supergroup'
   const question = `
 Hello ${resp.from.first_name}!
 
 What name of images do you want to see?   
-` 
-  if(isGroupChat) {
+`
+  if (isGroupChat) {
     bot.sendMessage(process.env.CHAT_ID, question)
-    bot.once('message', async (responseMsg)=>{
+    bot.once('message', async (responseMsg) => {
       bot.sendMessage(process.env.CHAT_ID, 'OK, your image will be visible as soon as possible. please wait!')
       const text = responseMsg.text
       try {
         const result = await imageScraper(text);
-      
+
         for (const item of result) {
           await bot.sendPhoto(process.env.CHAT_ID, item.url, {
             caption: item.title
           })
         }
-      
+
         // Setelah semua foto dikirim, kirim pesan lain
         await bot.sendMessage(process.env.CHAT_ID, 'That\'s all, if you want more please retype /getimages')
       } catch (error) {
         console.error('Error:', error)
       }
-      
+
     })
-    
+
   } else {
     bot.sendMessage(resp.from.id, question)
-    bot.once('message', async (responseMsg)=>{
+    bot.once('message', async (responseMsg) => {
       bot.sendMessage(responseMsg.from.id, 'OK, your image will be visible as soon as possible. please wait!')
       const text = responseMsg.text
       try {
         const result = await imageScraper(text);
-      
+
         for (const item of result) {
           await bot.sendPhoto(responseMsg.from.id, item.url, {
             caption: item.title
           })
         }
-      
+
         // Setelah semua foto dikirim, kirim pesan lain
         await bot.sendMessage(responseMsg.from.id, 'That\'s all, if you want more please retype /getimages')
       } catch (error) {
         console.error('Error:', error)
       }
-      
+
     })
   }
 })
+
+bot.onText(/\/get-acc-info/g, async (resp) => {
+
+  bot.sendMessage(resp.chat.id, 'enter a public key of your wallet')
+  bot.once('message', async (resp) => {
+    const pubKey = resp.text
+    const data = await getAccInfo(pubKey)
+
+    const msg = `
+your account info
+amount : ${(data.lamports / 1_000_000_000).toFixed(5)}
+rentEpoch: ${data.rentEpoch}
+`
+    bot.sendMessage(resp.chat.id, msg)
+  })
+})
+
+bot.onText(/\/getPavoMarket/g, async (resp) => {
+
+  const msg = `
+PAVO coin
+marketcap :   
+`
+  bot.sendMessage(resp.chat.id, msg)
+})
+
+// bot.onText(/\/getTradeView/g, async (resp) => {
+//   try {
+//     const data = await getTradeView()
+//     bot.sendMessage(resp.chat.id, `${JSON.stringify(data)}`)
+//     console.log(data)
+//   } catch (error) {
+//     console.log(error)
+//   }
+// })
 
 app.listen(port, () => {
   console.log(`app listen on http://localhost:${port}`)

@@ -2,15 +2,16 @@
   "name": "ramzy_bot",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "type": "module",
   "scripts": {
-    "start": "node main.js",
-    "dev": "nodemon main"
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@solana/web3.js": "^1.95.1",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -18,5 +19,8 @@
     "images-scraper": "^6.4.6",
     "node-telegram-bot-api": "^0.64.0",
     "puppeteer": "^22.2.0"
+  },
+  "devDependencies": {
+    "ws": "^8.18.0"
   }
 }

@@ -1,6 +1,6 @@
 // const puppeteer = require('puppeteer');
-const cheerio = require('cheerio');
-const scraper = require('images-scraper')
+import cheerio from 'cheerio';
+import scraper from 'images-scraper';
 
 
 // const scrape = async () => {
@@ -31,4 +31,4 @@ const imageScraper = async (query) => {
   return result
 }
 
-module.exports = imageScraper
+export default imageScraper
