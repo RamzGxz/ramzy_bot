@@ -6,7 +6,7 @@ import { } from 'dotenv'
 
 // const token = '7368378129:AAFyFLKlwNf4O_ffXdQ5dFmzTBGqwQdnnTs';
 const token = process.env.TELEGRAM_BOT_TOKEN || '7368378129:AAFyFLKlwNf4O_ffXdQ5dFmzTBGqwQdnnTs';
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token);
 
 // Membuat aplikasi express
 const app = express();
@@ -16,18 +16,18 @@ app.use(express.urlencoded({ extended: true }))
 // const URL = process.env.URL || 'https://bot-wellcome..vercel.app';
 
 
-bot.setWebHook(`${URL}/bot${token}`)
-    .then(() => {
-        console.log(`Webhook set to ${URL}/bot${token}`);
-    })
-    .catch((error) => {
-        console.error('Error setting webhook:', error);
-    });
+// bot.setWebHook(`${URL}/bot${token}`)
+//     .then(() => {
+//         console.log(`Webhook set to ${URL}/bot${token}`);
+//     })
+//     .catch((error) => {
+//         console.error('Error setting webhook:', error);
+//     });
 
 // Webhook endpoint
 app.post(`/bot${token}`, (req, res) => {
     console.log('Received webhook');
-    console.log(req.body);  // Tambahkan log untuk melihat payload yang diterima
+    console.log(req.body);
     bot.processUpdate(req.body)
         .then(() => {
             res.sendStatus(200);
